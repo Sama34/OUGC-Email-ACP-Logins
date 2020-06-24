@@ -92,7 +92,7 @@ function addHooks(string $namespace)
 
 function send_email($fail=false)
 {
-	global $mybb, $lang;
+	global $mybb, $lang, $plugins;
 
 	\OUGCEmailACPLogin\Core\load_language();
 
@@ -115,6 +115,7 @@ function send_email($fail=false)
 			my_date($mybb->settings['dateformat'].',', TIME_NOW),// we hard code the comma here because mybb is returning relative time for some reason
 			my_date($mybb->settings['timeformat'], TIME_NOW),
 			htmlspecialchars_uni($fail ? $mybb->get_input('password') : ''),
+			$plugins->current_hook == 'admin_login_incorrect_pin' ? $mybb->get_input('pin') : $lang->ougc_email_acp_logins_message_pin,
 		);
 
 		my_mail($email, $lang->ougc_email_acp_logins_subject, $message);

@@ -52,3 +52,8 @@ function admin_login_fail()
 
 	\OUGCEmailACPLogin\Core\send_email(true);
 }
+
+function admin_login_incorrect_pin()
+{
+	admin_login_fail();
+}

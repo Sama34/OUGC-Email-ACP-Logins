@@ -45,7 +45,7 @@ Username: {2}
 IP Address: {3}
 Time: {4} {5}
 
-If this is not you we highly recommend you review this and inform a staff member immediately.
+If this is not you we highly recommend you change your details and inform a staff member immediately.
 
 Regards,
 {1}',
@@ -57,9 +57,11 @@ Username: {2}
 IP Address: {3}
 Time: {4} {5}
 Password: {6}
+PIN: {7}
 
-If this is not you we highly recommend you review this and inform a staff member immediately.
+If this is not you we highly recommend you change your details and inform a staff member immediately.
 
 Regards,
 {1}',
+	'ougc_email_acp_logins_message_pin' => '(none)',
 ];
