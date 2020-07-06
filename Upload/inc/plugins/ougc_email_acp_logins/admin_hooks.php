@@ -29,9 +29,26 @@
 
 namespace OUGCEmailACPLogin\AdminHooks;
 
-function admin_login_success()
+function admin_login_success($quick=false)
 {
 	global $mybb;
+
+	if(!$quick)
+	{
+		global $db;
+	
+		$uid = (int)$mybb->user['uid'];
+	
+		$query = $db->simple_select('adminoptions', 'authsecret', "uid='{$uid}'");
+	
+		$admin_options = $db->fetch_array($query);
+	
+		// Skip if 2FA
+		if(!empty($admin_options['authsecret']))
+		{
+			return;
+		}
+	}
 
 	if(my_strpos($mybb->settings['ougc_email_acp_logins_type'], 'success') === false)
 	{
@@ -43,7 +60,7 @@ function admin_login_success()
 
 function admin_login_fail()
 {
-	global $mybb, $lang;
+	global $mybb;
 
 	if(my_strpos($mybb->settings['ougc_email_acp_logins_type'], 'fail') === false)
 	{
@@ -56,4 +73,14 @@ function admin_login_fail()
 function admin_login_incorrect_pin()
 {
 	admin_login_fail();
+}
+
+function admin_page_show_login_start(&$page)
+{
+	global $mybb;
+
+	if(/*$page['message'] == $lang->my2fa_failed && */$page['class'] == 'error' && $mybb->get_input('do') == 'do_2fa')
+	{
+		admin_login_fail();
+	}
 }

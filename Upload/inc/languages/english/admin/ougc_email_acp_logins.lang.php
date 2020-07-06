@@ -36,7 +36,8 @@ $l = [
 	'setting_ougc_email_acp_logins_type_fail' => 'Fail',
 	'setting_ougc_email_acp_logins_email' => 'Email',
 	'setting_ougc_email_acp_logins_email_desc' => 'Insert the email to send the message to. One email per line.',
-	'ougc_email_acp_logins_subject' => 'ACP Login Attempt',
+	'ougc_email_acp_logins_subject_success' => 'Successful ACP Login Attempt	',
+	'ougc_email_acp_logins_subject_fail' => 'Failed ACP Login Attempt',
 	'ougc_email_acp_logins_message' => 'Hi,
 
 This is an automatic email to notify you that someone has recently attempted to login into the ACP at {1} and succeeded.

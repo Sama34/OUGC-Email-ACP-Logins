@@ -118,6 +118,65 @@ function send_email($fail=false)
 			$plugins->current_hook == 'admin_login_incorrect_pin' ? $mybb->get_input('pin') : $lang->ougc_email_acp_logins_message_pin,
 		);
 
-		my_mail($email, $lang->ougc_email_acp_logins_subject, $message);
+		my_mail($email, $fail ? $lang->ougc_email_acp_logins_subject_fail : $lang->ougc_email_acp_logins_subject_success, $message);
 	}
+}
+
+// control_object by Zinga Burga from MyBBHacks ( mybbhacks.zingaburga.com ), 1.62
+function control_object(&$obj, $code)
+{
+	static $cnt = 0;
+	$newname = '_objcont_'.(++$cnt);
+	$objserial = serialize($obj);
+	$classname = get_class($obj);
+	$checkstr = 'O:'.strlen($classname).':"'.$classname.'":';
+	$checkstr_len = strlen($checkstr);
+	if(substr($objserial, 0, $checkstr_len) == $checkstr)
+	{
+		$vars = array();
+		// grab resources/object etc, stripping scope info from keys
+		foreach((array)$obj as $k => $v)
+		{
+			if($p = strrpos($k, "\0"))
+			{
+				$k = substr($k, $p+1);
+			}
+			$vars[$k] = $v;
+		}
+		if(!empty($vars))
+		{
+			$code .= '
+				function ___setvars(&$a) {
+					foreach($a as $k => &$v)
+						$this->$k = $v;
+				}
+			';
+		}
+		eval('class '.$newname.' extends '.$classname.' {'.$code.'}');
+		$obj = unserialize('O:'.strlen($newname).':"'.$newname.'":'.substr($objserial, $checkstr_len));
+		if(!empty($vars))
+		{
+			$obj->___setvars($vars);
+		}
+	}
+	// else not a valid object or PHP serialize has changed
+}
+
+global $mybb;
+
+if($mybb->get_input('do') == 'do_2fa' && $mybb->request_method == 'post')
+{
+	\OUGCEmailACPLogin\Core\control_object($GLOBALS['db'], '
+		function update_query($table, $array, $where="", $limit="", $no_quote=false)
+		{
+			global $test, $recovery, $mybb, $auth;
+
+			if($table == "adminoptions" && $where == "uid=\'{$mybb->user[\'uid\']}\'" && !empty($auth) && (!empty($test) || !empty($recovery)))
+			{
+				\OUGCEmailACPLogin\AdminHooks\admin_login_success(true);
+			}
+
+			return parent::update_query($table, $array, $where, $limit, $no_quote);
+		}
+	');
 }
